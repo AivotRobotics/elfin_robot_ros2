@@ -1,6 +1,14 @@
+ALERT: 
+======
+Branch `humble_hr_sdk` is an attempt to use HR SDK to control Elfin robot instead the legacy EtherCAT driver. The new `HardwareInteface` is implemented in `elfin_robot_driver` package 
+and supports a simple position-based control via online servoing.
+
+No additional features like electrifying the robot or proper error handling or integration with existing tools are implemented.  
+
+-------------------------------
+
 Elfin Robot
 ======
-
 
 Chinese version of the README -> please [click here](./README_cn.md)
 
