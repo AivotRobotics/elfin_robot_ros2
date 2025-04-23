@@ -1,0 +1,8 @@
+{
+    "cmake.sourceDirectory": "/home/sergio/aivot_ws/src/elfin_robot_ros2/elfin_basic_api",
+    "C_Cpp.errorSquiggles": "enabled",
+    "files.associations": {
+        "memory": "cpp",
+        "string": "cpp"
+    }
+}
