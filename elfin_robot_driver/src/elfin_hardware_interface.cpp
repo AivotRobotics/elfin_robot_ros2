@@ -40,20 +40,41 @@ namespace elfin_robot_driver {
     }
 
     hardware_interface::return_type ElfinHardwareInterface::prepare_command_mode_switch(const std::vector<std::string>& start, const std::vector<std::string>& stop) {
-        const auto is_hw_if_pos = [](const std::string& intf) { return intf.find(hardware_interface::HW_IF_POSITION) != std::string::npos; };
 
-        if(const auto num_stop = std::count_if(stop.begin(), stop.end(), is_hw_if_pos); num_stop == NUM_JOINTS) {
+        auto start_intfs = std::vector<std::string>();
+        auto stop_intfs = std::vector<std::string>();
+
+        const auto is_hw_if_pos = [] (const std::string & intf) {
+            return intf.find(hardware_interface::HW_IF_POSITION) != std::string::npos;
+        };
+
+        const auto is_intf_own = [&] (const std::string & intf) {
+            return std::find_if(info_.joints.begin(), info_.joints.end(), [&intf] (const auto & jnt_info) {
+                            return intf == jnt_info.name;
+                        }) != info_.joints.end();
+        };
+
+        std::copy_if(start.begin(), start.end(), std::back_inserter(start_intfs), is_intf_own);
+        std::copy_if(stop.begin(), stop.end(), std::back_inserter(stop_intfs), is_intf_own);
+
+        const auto num_stop_intfs = std::count_if(stop_intfs.begin(), stop_intfs.end(), is_hw_if_pos);
+        if (num_stop_intfs > 0) {
+            if (num_stop_intfs != NUM_JOINTS) {
+                RCLCPP_FATAL(logger_, "Expected %d position interfaces to stop, but god %ld instead.", NUM_JOINTS, num_stop_intfs);
+                return hardware_interface::return_type::ERROR;
+            }
+
             position_intf_claimed_ = false;
-        } else if (num_stop != 0) {
-            RCLCPP_FATAL(logger_, "Expected %d position interfaces to stop, but god %ld instead.", NUM_JOINTS, num_stop);
-            return hardware_interface::return_type::ERROR;
         }
 
-        if (const auto num_start = std::count_if(start.begin(), start.end(), is_hw_if_pos); num_start == NUM_JOINTS) {
+        const auto num_start_intfs = std::count_if(start_intfs.begin(), start_intfs.end(), is_hw_if_pos);
+        if (num_start_intfs > 0) {
+            if (num_start_intfs != NUM_JOINTS) {
+                RCLCPP_FATAL(logger_, "Expected %d position interfaces to start, but god %ld instead.", NUM_JOINTS, num_stop_intfs);
+                return hardware_interface::return_type::ERROR;
+            }
+
             position_intf_claimed_ = true;
-        } else if (num_start != 0) {
-            RCLCPP_FATAL(logger_,"Expected %d position interfaces to start, but god %ld instead.", NUM_JOINTS, num_start);
-            return hardware_interface::return_type::ERROR;
         }
 
         return hardware_interface::return_type::OK;
