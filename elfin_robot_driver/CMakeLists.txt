@@ -41,7 +41,6 @@ install(
 )
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY elfin_sdk_vendor/lib/ DESTINATION lib)
-install(DIRECTORY urdf DESTINATION share/${PROJECT_NAME})
 
 ament_export_targets(export_elfin_hardware_interface HAS_LIBRARY_TARGET)
 ament_export_dependencies(${DEPENDENCIES})
